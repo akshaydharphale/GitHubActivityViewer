@@ -2,13 +2,16 @@ from requests_oauthlib import OAuth2Session
 from flask import Flask, request, redirect, session, url_for
 from flask.json import jsonify
 import os
-
+import yaml
+import json
+import sys
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 app = Flask(__name__)
 
 
 # This information is obtained upon registration of a new GitHub
-client_id = "9a57953f0879d6d17ed0"
-client_secret = "5859eaa64c6e5cda67401fea54b827edfcc89334"
+client_id = "registered_Application_client_Id"
+client_secret = "registeredApplication_secret"
 authorization_base_url = 'https://github.com/login/oauth/authorize'
 token_url = 'https://github.com/login/oauth/access_token'
 
@@ -30,7 +33,7 @@ def demo():
 
 # Step 2: User authorization, this happens on the provider.
 
-@app.route("/callback", methods=["GET"])
+@app.route("/callback/", methods=["GET"])
 def callback():
     """ Step 3: Retrieving an access token.
 
@@ -47,7 +50,6 @@ def callback():
     # the token and show how this is done from a persisted token
     # in /profile.
     session['oauth_token'] = token
-
     return redirect(url_for('.profile'))
 
 
@@ -56,12 +58,27 @@ def profile():
     """Fetching a protected resource using an OAuth 2 token.
     """
     github = OAuth2Session(client_id, token=session['oauth_token'])
-    return jsonify(github.get('https://api.github.com/user').json())
+    recJson = json.dumps(github.get('https://api.github.com/user').json())
+    recDic = json.loads(recJson)
+    eventUrl = recDic['received_events_url']
+    eventDic = json.loads(json.dumps(github.get(eventUrl).json()))
+    i = 0
+    responseJson = "["
+    for event in eventDic:
+        responseJson = responseJson +  '{"EventRepository":" '+eventDic[i]['repo']['name']+'","EventType":"'+eventDic[i]['type']+'"},'
+        i = i + 1
 
+    responseJson = responseJson + '{"EndOfEvent":"FinalEvent"}]'
+    #print responseJson
+    return jsonify(json.loads(responseJson))
+
+
+app.secret_key = os.urandom(24)
 
 if __name__ == "__main__":
     # This allows us to use a plain HTTP callback
     os.environ['DEBUG'] = "1"
-
-    app.secret_key = os.urandom(24)
-    app.run(debug=True)
+    app.config['SESSION_TYPE'] = 'filesystem'
+    sess.init_app(app)
+    app.debug = True
+    app.run()
