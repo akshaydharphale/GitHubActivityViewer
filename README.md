@@ -15,7 +15,7 @@ Deploying Flask Apps to an Ubuntu Server
 https://www.youtube.com/watch?v=kDRRtPO0YPA
 
 ***************************************************************
-This information is obtained upon registration of a new GitHub
+This information is obtained upon registration of a new GitHub,
 Update these two line : with your registered Application Details
 
 ***************************************************************
