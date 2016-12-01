@@ -12,5 +12,7 @@ https://www.youtube.com/watch?v=kDRRtPO0YPA
 This information is obtained upon registration of a new GitHub
 Update these two line : with your registered Application Details
 
+**
 client_id = "registered_Application_client_Id"
+**
 client_secret = "registeredApplication_secret"
